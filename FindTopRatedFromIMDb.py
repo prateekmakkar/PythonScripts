@@ -19,8 +19,9 @@ dictOfLinks = {}
 
 def findTopRatedByFilters():
     genre = getInput(str, "Enter the genre from this list \n" +
-                     "\n".join([", ".join(genresList[i:i + 10]) for i in range(0, len(genresList), 10)]) +
-                     ' (Press Enter for all genres)', "", lambda x: x.lower() not in genresList)
+                     "\n".join([",".join(genresList[i:i + 10]) for i in range(0, len(genresList), 10)]) +
+                     ' (Press Enter for all genres)', "",
+                     lambda x: len(x) == 0 or x.lower() in {i.lower() for i in genresList})
     printHashes()
 
     url = "https://www.imdb.com/search/title/?sort=user_rating&view=simple&num_votes=25000,"
@@ -109,9 +110,13 @@ def getInput(inputType, text, defaultValue, ConditionFilter):
             userInput = int(input(text)) if inputType == int else str(input(text)).lower()
             if ConditionFilter(userInput):
                 break
-            print("Invalid option. Please choose again")
+            print("You have chosen an Invalid option. Please choose the correct option")
     except ValueError:
-        print("Invalid Input using default value as " + str(defaultValue))
+        if defaultValue == -1:
+            print("\nExiting....")
+        else:
+            print("Invalid Input provided. Proceeding with using default value as " +
+                  BOLD_START + str(defaultValue) + BOLD_END)
         return defaultValue
     return userInput
 
@@ -123,7 +128,7 @@ def printHashes():
 try:
     os.system("clear")
     printHashes()
-    dramaType = getInput(int, "Enter 1. for TV Series & 2. for Movies ", 2, lambda x: x < 3)
+    dramaType = getInput(int, "Enter '1' for TV Series & '2' for Movies ", MOVIES, lambda x: x < 3)
     limit = getInput(int, "Enter the number of top items (Max 250) you want ", 10, lambda x: x <= 250)
 
     dramaName = ("%s" % MOVIES) if dramaType == 2 else ("%s" % SERIES)
